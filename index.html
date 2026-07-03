@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume · View & Download</title>
+  <!-- Font Awesome 6 (free) for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- html2pdf library for PDF conversion -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f4f7fc;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    /* main card */
+    .resume-card {
+      max-width: 1100px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    /* header with actions */
+    .resume-header {
+      padding: 1.8rem 2.5rem;
+      background: #ffffff;
+      border-bottom: 1px solid #eef2f6;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+    }
+
+    .resume-header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #0b1e33;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .resume-header h1 i {
+      color: #2a6df4;
+      font-size: 1.6rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 1rem;
+      border: none;
+      background: #f0f4fe;
+      color: #1a3b6b;
+      cursor: pointer;
+      transition: 0.2s;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0, 20, 50, 0.04);
+    }
+
+    .btn i {
+      font-size: 1.1rem;
+    }
+
+    .btn-primary {
+      background: #1a3b6b;
+      color: white;
+      box-shadow: 0 8px 18px -6px rgba(26, 59, 107, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #0f2b4f;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -8px rgba(26, 59, 107, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #d0d9e8;
+      color: #1f3a5f;
+    }
+
+    .btn-outline:hover {
+      background: #e9eff9;
+      border-color: #a0b8d6;
+      transform: translateY(-2px);
+    }
+
+    /* resume content (view) */
+    .resume-body {
+      padding: 2.5rem 2.5rem 2.8rem;
+      background: #ffffff;
+    }
+
+    /* the "view" area – like a clean document preview */
+    .resume-preview {
+      background: #fafcff;
+      border-radius: 24px;
+      padding: 2rem 2.2rem;
+      border: 1px solid #e9eff6;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+    }
+
+    .resume-preview h2 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #0b1e33;
+      margin-bottom: 0.1rem;
+    }
+
+    .resume-preview .title {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #2a6df4;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e6edf8;
+      padding-bottom: 0.8rem;
+    }
+
+    .resume-preview .contact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem 2.5rem;
+      font-size: 0.95rem;
+      color: #1f3a5f;
+      margin-bottom: 2rem;
+      background: #f2f7ff;
+      padding: 0.9rem 1.2rem;
+      border-radius: 60px;
+    }
+
+    .resume-preview .contact-row i {
+      width: 1.4rem;
+      color: #2a6df4;
+    }
+
+    .resume-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.8rem 2.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .resume-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+      }
+      .resume-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .action-buttons {
+        justify-content: center;
+      }
+      .resume-preview .contact-row {
+        border-radius: 20px;
+        justify-content: center;
+      }
+    }
+
+    .resume-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0b1e33;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid #dce6f2;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .resume-section h3 i {
+      color: #2a6df4;
+      font-size: 1rem;
+      width: 1.6rem;
+    }
+
+    .resume-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .resume-section li {
+      margin-bottom: 0.7rem;
+      line-height: 1.5;
+      color: #1f344d;
+    }
+
+    .resume-section li strong {
+      color: #0b1e33;
+      font-weight: 600;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    .skill-tag {
+      background: #eaf1fd;
+      color: #1a3b6b;
+      padding: 0.25rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      border: 1px solid #d4e2f7;
+    }
+
+    .job-item {
+      margin-bottom: 1.4rem;
+    }
+
+    .job-item .job-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #0b1e33;
+    }
+
+    .job-item .company {
+      font-weight: 400;
+      color: #2a4c7a;
+    }
+
+    .job-item .date {
+      font-weight: 400;
+      color: #5b7293;
+      font-size: 0.9rem;
+    }
+
+    .job-item p {
+      margin-top: 0.3rem;
+      color: #1f344d;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .badge-download {
+      background: #e7f0ff;
+      border-radius: 40px;
+      padding: 0.3rem 1.2rem;
+      font-size: 0.8rem;
+      color: #1a3b6b;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+      .resume-preview h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="resume-card" id="resumeApp">
+    <!-- header with actions -->
+    <div class="resume-header">
+      <h1>
+        <i class="fas fa-file-user"></i> 
+        Resume
+      </h1>
+      <div class="action-buttons">
+        <!-- View button (scrolls to preview, but it's always visible) -->
+        <button class="btn btn-outline" id="viewBtn" title="Scroll to resume preview">
+          <i class="fas fa-eye"></i> View
+        </button>
+        <!-- Download button (triggers PDF download) -->
+        <button class="btn btn-primary" id="downloadBtn" title="Download resume as PDF">
+          <i class="fas fa-download"></i> Download
+        </button>
+      </div>
+    </div>
+
+    <!-- resume content (view) -->
+    <div class="resume-body" id="resumeView">
+      <div class="resume-preview">
+        <!-- ========== RESUME CONTENT ========== -->
+        <h2>Poorvika Shiva Karkera</h2>
+
+        <div class="contact-row">
+          <span><i class="fas fa-envelope"></i> poorvikakarkera@gmail.com</span>
+          <span><i class="fas fa-phone-alt"></i> +91 7022875831</span>
+          <span><i class="fas fa-map-pin"></i> Udupi,Karnataka</span>
+          <span><i class="fab fa-linkedin"></i> https://www.linkedin.com/in/poorvika-karkera</span>
+        </div>
+
+        <div class="resume-grid">
+          <!-- left column: Education and Skills -->
+          <div>
+            <div class="resume-section">
+              <h3><i class="fas fa-user-graduate"></i> Education</h3>
+              <ul>
+                <li><strong>Bachelor of Engineering in CSE ( IoT, CyberSecurity including Blockchain)</strong><br />Alvas Institute of Engineering and Technology Moodbidre,(CGPA : 8.46)          2023-Present</li>
+                <li style="margin-top: 0.8rem;"><strong>Department of PRE University Education (12th)</strong><br />Government Pre University College Hiriyadka,(Percentage : 87%)            2021-2023</li>
+                <li style="margin-top: 0.8rem;"><strong>SSLC (10th)</strong><br /> Karnataka Public School Hiriadka,(Percentage : 89%)            2021</li>
+              </ul>
+            </div>
+
+            <div class="resume-section" style="margin-top: 1.8rem;">
+              <h3><i class="fas fa-code"></i> Technology Skills</h3>
+              <div class="skill-tags">
+                <span class="skill-tag">Programming Language:   C, Python</span>
+                <span class="skill-tag"> Web Technologies:    HTML, CSS, JS</span>
+                <span class="skill-tag"> Tools and Platforms:    Git, GitHub</span>
+                <span class="skill-tag">Professional Skills:    Problem Solving , Detail Oriented</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- right column: Certifications and Projects -->
+          <div>
+            <div class="resume-section">
+              <h3><i class="fas fa-briefcase"></i> Certifications</h3>
+              <div class="job-item">
+                <div class="job-header">
+                  <span>IBM Software Engineering Professional Certificate (IBM)</span>
+                  <span class="company">2025</span>
+                </div>
+              </div>
+              <div class="job-item">
+                <div class="job-header">
+                  <span>Introduction to Internet of Things (NPTEL)</span>
+                  <span class="company">Jan-Jun 2025</span>
+                </div>
+              </div>
+              <div class="job-item">
+                <div class="job-header">
+                  <span>AWS Fundamentals of Generative AI for Beginners Certification(Coursera)</span>
+                  <span class="company">2025 </span>
+                </div>
+              </div>
+              <div class="job-item">
+                <div class="job-header">
+                  <span>The Joy of Computing Using Python (NPTEL)</span>
+                  <span class="company">Jul-Dec 2025 </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="resume-section" style="margin-top: 1.5rem;">
+              <h3><i class="fas fa-pen-fancy"></i> Projects</h3>
+              <ul>
+                <li><strong>Personal Portfolio Website:</strong> – Developed a responsive personal portfolio website using HTML and CSS to showcase skills and projects</li>
+                <li><strong> Weather Forecasting App using API:</strong> – Developed a Weather Forecasting Application using Weather API to provide real-time weather updates based on user-selected locations</li>
+                <li><strong>IoT-Based Temperature Monitor:</strong> – Designed a conceptual system for temperature monitoring using IoT principles learned through certification.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- tiny footer note (just for style) -->
+        <div style="margin-top: 2rem; font-size: 0.75rem; color: #8196b7; border-top: 1px solid #e6edf8; padding-top: 1rem; display: flex; justify-content: space-between; flex-wrap: wrap;">
+          <span><i class="fas fa-print"></i>  ·  updated July 2026</span>
+          <span><i class="fas fa-check-circle" style="color: #2a6df4;"></i>  open to opportunities</span>
+        </div>
+        <!-- ========== END RESUME CONTENT ========== -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      "use strict";
+
+      // 0. ALIGNMENT TOGGLE: switch between left and right alignment
+      const alignToggleBtn = document.getElementById('alignToggleBtn');
+      const resumePreview = document.querySelector('.resume-preview');
+      let isLeftAligned = true;
+
+      // 1. VIEW button: smoothly scroll to the resume preview
+      const viewBtn = document.getElementById('viewBtn');
+      const resumeView = document.getElementById('resumeView');
+
+      if (viewBtn && resumeView) {
+        viewBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          resumeView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+
+      // 2. DOWNLOAD button: convert resume preview to PDF and download
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      downloadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // grab the current resume preview HTML (the .resume-preview element)
+        const previewElement = document.querySelector('.resume-preview');
+        if (!previewElement) return;
+
+        // Create a temporary container for PDF conversion
+        const element = previewElement.cloneNode(true);
+        
+        // HTML to PDF options
+        const opt = {
+          margin: 10,
+          filename: 'My_Resume.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+        };
+
+        // Generate PDF from the element
+        html2pdf().set(opt).from(element).save();
+      });
+
+    })();
+  </script>
+
+</body>
+</html>
